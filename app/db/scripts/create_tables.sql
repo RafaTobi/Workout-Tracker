@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS exercise (
-    id          INTEGER PRIMARY KEY,
+    id          SERIAL PRIMARY KEY,
     name        VARCHAR(50) NOT NULL,
     description TEXT,
     category    VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS workout_plan (
-    id          INTEGER PRIMARY KEY,
+    id          SERIAL PRIMARY KEY,
     name        VARCHAR (50) NOT NULL,
     description TEXT,
     schedule    TIMESTAMP,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS workout_plan (
 );
 
 CREATE TABLE IF NOT EXISTS workout_plan_exercise (
-    id              INTEGER PRIMARY KEY,
+    id              SERIAL PRIMARY KEY,
     reps            INTEGER NOT NULL,
     weight          NUMERIC(6,2) NOT NULL,
     exercise_id     INTEGER REFERENCES exercise(id) ON DELETE CASCADE,
