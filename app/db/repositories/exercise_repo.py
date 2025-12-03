@@ -1,4 +1,20 @@
 from app.db.connection import get_connection
+from app.models import Exercise
+
+
+def insert_exercise(exercise: Exercise):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO exercise (name, description, category)
+                    VALUES (%s, %s, %s);
+                    """,
+                    (exercise.name, exercise.description, exercise.category)
+                )
+    except Exception as e:
+        print("A database error has occurred: ", e)
 
 
 def get_all_exercises():
@@ -14,17 +30,17 @@ def get_all_exercises():
     except Exception as e:
         print("A database error has occurred: ", e)
 
-
-def insert_exercise(name, desc, cat):
+def get_exercise_by_id(id: int):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
                     """
-                    INSERT INTO exercise (name, description, category)
-                    VALUES (%s, %s, %s);
+                    SELECT * FROM exercise
+                    WHERE id=%s;
                     """,
-                    (name, desc, cat)
+                    (id,)
                 )
+                return cur.fetchone()
     except Exception as e:
         print("A database error has occurred: ", e)
