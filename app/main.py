@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api import exercises
+from api import exercises, workout_plans
 
 
 app = FastAPI()
 app.include_router(exercises.router)
+app.include_router(workout_plans.router)
 
 
 origins = [""]
