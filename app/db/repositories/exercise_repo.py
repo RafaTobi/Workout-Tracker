@@ -1,8 +1,8 @@
 from app.db.connection import get_connection
-from app.models import Exercise
+from app.models.exercise import *
 
 
-def insert_exercise(exercise: Exercise):
+def create_exercise(exercise: ExerciseBase): # FIXME basemodel?
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:

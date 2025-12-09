@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS workout_plan (
 
 CREATE TABLE IF NOT EXISTS workout_plan_exercise (
     id              SERIAL PRIMARY KEY,
+    set_nr          INTEGER NOT NULL,
     reps            INTEGER NOT NULL,
     weight          NUMERIC(6,2) NOT NULL,
     exercise_id     INTEGER REFERENCES exercise(id) ON DELETE CASCADE,
