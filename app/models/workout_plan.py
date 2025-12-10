@@ -9,5 +9,4 @@ from app.models.exercise import WorkoutExerciseIn
 class WorkoutPlanExerciseIn(BaseModel):
     name: str
     description: str
-    schedule: datetime
     exercises: List[WorkoutExerciseIn]

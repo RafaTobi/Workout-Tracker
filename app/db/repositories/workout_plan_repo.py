@@ -8,11 +8,11 @@ def create_workout_plan_with_exercises(wp_ex: WorkoutPlanExerciseIn):
             with conn.cursor() as cur:
                 cur.execute(
                     """
-                    INSERT INTO workout_plan (name, description, schedule)
-                    VALUES (%s, %s, %s)
+                    INSERT INTO workout_plan (name, description)
+                    VALUES (%s, %s)
                     RETURNING id;
                     """,
-                    (wp_ex.name, wp_ex.description, wp_ex.schedule)
+                    (wp_ex.name, wp_ex.description)
                 )
                 wp_id = cur.fetchone()[0]
 
@@ -21,7 +21,6 @@ def create_workout_plan_with_exercises(wp_ex: WorkoutPlanExerciseIn):
                     ex_id = exercise.exercise_id
                     for s in exercise.sets:
                         values.append([s.set_nr, s.reps, s.weight, ex_id, wp_id])
-                print(values)
 
                 cur.executemany(
                     """
