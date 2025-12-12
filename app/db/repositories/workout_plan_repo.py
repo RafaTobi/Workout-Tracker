@@ -1,8 +1,11 @@
+from psycopg2 import sql
+
 from app.db.connection import get_connection
-from app.models.workout_plan import WorkoutPlanExerciseIn
+from app.db.repositories.workout_plan_exercise_repo import add_workout_plan_exercise, delete_workout_plan_exercise_db
+from app.models.workout_plan import WorkoutPlanUpdate, WorkoutPlanBase
 
 
-def create_workout_plan_with_exercises(wp_ex: WorkoutPlanExerciseIn):
+def add_workout_plan(wp_ex: WorkoutPlanBase):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
@@ -15,25 +18,14 @@ def create_workout_plan_with_exercises(wp_ex: WorkoutPlanExerciseIn):
                     (wp_ex.name, wp_ex.description)
                 )
                 wp_id = cur.fetchone()[0]
+                conn.commit()
 
-                values = []
-                for exercise in wp_ex.exercises:
-                    ex_id = exercise.exercise_id
-                    for s in exercise.sets:
-                        values.append([s.set_nr, s.reps, s.weight, ex_id, wp_id])
-
-                cur.executemany(
-                    """
-                    INSERT INTO workout_plan_exercise (set_nr, reps, weight, exercise_id, workout_plan_id)
-                    VALUES (%s, %s, %s, %s, %s);
-                    """,
-                    values
-                )
+                add_workout_plan_exercise(wp_id, wp_ex.exercises)
     except Exception as e:
         print("A database error has occurred: ", e)
 
 
-def get_all_workout_plans():
+def fetch_all_workout_plans():
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
@@ -47,16 +39,61 @@ def get_all_workout_plans():
         print("A database error has occurred: ", e)
 
 
-def get_workout_plan_by_id(id: int):
+def fetch_workout_plan_by_id(wp_id: int):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
                     """
                     SELECT * FROM workout_plan
-                    WHERE id=%s;
+                    WHERE id = %s;
                     """,
-                    (id,)
+                    (wp_id,)
+                )
+                return cur.fetchone()
+    except Exception as e:
+        print("A database error has occurred: ", e)
+
+
+def update_workout_plan_db(wp_up: WorkoutPlanUpdate):
+    # Query to update current workout_plan values
+    update_query = sql.SQL(
+        """
+        UPDATE workout_plan
+        SET name = %s, description = %s
+        WHERE id = %s
+        """
+    )
+
+    wp_id = wp_up.plan_id
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                # Update WP
+                cursor.execute(
+                    update_query,
+                    (
+                        wp_up.name, wp_up.description, wp_id
+                    ))
+
+                # Delete old WPE
+                delete_workout_plan_exercise_db(wp_id)
+                # Add new WPE
+                add_workout_plan_exercise(wp_id, wp_up.exercises)
+    except Exception as e:
+        print("A database error has occurred: ", e)
+
+
+def delete_workout_plan_db(wp_id: int):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    DELETE FROM workout_plan
+                    WHERE id = %s;
+                    """,
+                    (wp_id,)
                 )
                 return cur.fetchone()
     except Exception as e:

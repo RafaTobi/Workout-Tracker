@@ -2,7 +2,7 @@ from app.db.connection import get_connection
 from app.models.exercise import *
 
 
-def create_exercise(exercise: ExerciseBase): # FIXME basemodel?
+def create_exercise(exercise: ExerciseBase):
     try:
         with get_connection() as conn:
             with conn.cursor() as cur:
